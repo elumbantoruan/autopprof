@@ -40,6 +40,7 @@ type CPUProfile struct {
 	Duration time.Duration // 30 seconds by default
 }
 
+// Capture captures and writes the CPUProfile
 func (p CPUProfile) Capture() (string, error) {
 	dur := p.Duration
 	if dur == 0 {
@@ -61,6 +62,7 @@ func (p CPUProfile) Capture() (string, error) {
 // HeapProfile captures the heap profile.
 type HeapProfile struct{}
 
+// Capture captures and writes the HeapProfile
 func (p HeapProfile) Capture() (string, error) {
 	f := newTemp()
 	if err := pprof.WriteHeapProfile(f); err != nil {
@@ -72,7 +74,90 @@ func (p HeapProfile) Capture() (string, error) {
 	return f.Name(), nil
 }
 
-// TODO(jbd): Add all supported profiles.
+// GoRoutineProfile captures the goroutine profile.
+type GoRoutineProfile struct{}
+
+// Capture captures and writes the GoRoutine profile
+func (p GoRoutineProfile) Capture() (string, error) {
+	f := newTemp()
+
+	if err := pprof.Lookup("goroutine").WriteTo(f, 0); err != nil {
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		return "", nil
+	}
+
+	return f.Name(), nil
+}
+
+// ThreadCreateProfile captures the thread create profile
+type ThreadCreateProfile struct{}
+
+// Capture captures and writes the ThreadCreateProfile
+func (p ThreadCreateProfile) Capture() (string, error) {
+	f := newTemp()
+
+	if err := pprof.Lookup("threadcreate").WriteTo(f, 0); err != nil {
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		return "", nil
+	}
+
+	return f.Name(), nil
+}
+
+// AllocsProfile captures the allocs profile
+type AllocsProfile struct{}
+
+// Capture captures and writes the AllocsProfile
+func (p AllocsProfile) Capture() (string, error) {
+	f := newTemp()
+
+	if err := pprof.Lookup("allocs").WriteTo(f, 0); err != nil {
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		return "", nil
+	}
+
+	return f.Name(), nil
+}
+
+// BlockProfile captures the block profile
+type BlockProfile struct{}
+
+// Capture captures and writes the BlockProfile
+func (p BlockProfile) Capture() (string, error) {
+	f := newTemp()
+
+	if err := pprof.Lookup("block").WriteTo(f, 0); err != nil {
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		return "", nil
+	}
+
+	return f.Name(), nil
+}
+
+// MutexProfile captures the mutex profile
+type MutexProfile struct{}
+
+// Capture captures and writes the MutexProfile
+func (p MutexProfile) Capture() (string, error) {
+	f := newTemp()
+
+	if err := pprof.Lookup("mutex").WriteTo(f, 0); err != nil {
+		return "", err
+	}
+	if err := f.Close(); err != nil {
+		return "", nil
+	}
+
+	return f.Name(), nil
+}
 
 // Capture captures the given profiles at SIGINT
 // and opens a browser with the collected profiles.
